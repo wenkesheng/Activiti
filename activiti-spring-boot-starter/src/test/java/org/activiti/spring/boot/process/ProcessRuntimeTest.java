@@ -16,12 +16,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -68,14 +66,14 @@ public class ProcessRuntimeTest {
 
         //when
         Page<ProcessDefinition> processDefinitionPage = processRuntime.processDefinitions(Pageable.of(0,
-                                                                                                      50));
+                50));
         //then
         assertThat(processDefinitionPage.getContent()).isNotNull();
         assertThat(processDefinitionPage.getContent())
                 .extracting(ProcessDefinition::getKey)
                 .contains(CATEGORIZE_PROCESS,
-                          CATEGORIZE_HUMAN_PROCESS,
-                          ONE_STEP_PROCESS);
+                        CATEGORIZE_HUMAN_PROCESS,
+                        ONE_STEP_PROCESS);
     }
 
     @Test
@@ -329,17 +327,25 @@ public class ProcessRuntimeTest {
 
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test()
     public void adminFailTest() {
         securityUtil.logInAs("salaboy");
-        ProcessInstance fakeId = processAdminRuntime.processInstance("fakeId");
+        //when
+        Throwable throwable = catchThrowable(() -> processAdminRuntime.processInstance("fakeId"));
+        //then
+        assertThat(throwable)
+                .isInstanceOf(AccessDeniedException.class);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test()
     public void userFailTest() {
         securityUtil.logInAs("admin");
-        Page<ProcessDefinition> processDefinitionPage = processRuntime.processDefinitions(Pageable.of(0,
-                50));
+        //when
+        Throwable throwable = catchThrowable(() -> processRuntime.processDefinitions(Pageable.of(0,
+                50)));
+        //then
+        assertThat(throwable)
+                .isInstanceOf(AccessDeniedException.class);
     }
 
 
