@@ -209,6 +209,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
+ * ProcessEngineConfigurationImpl是一个抽象类,
+ * 两种配置风格中使用到的两个流程引擎配置类
+ * StandaloneProcessEngineConfiguration和SpringProcessEngineConfiguration均继承ProcessEngineConfigurationImpl类
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration {  
 
@@ -361,37 +364,37 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // buildProcessEngine ///////////////////////////////////////////////////////
   
   public ProcessEngine buildProcessEngine() {
-    init();
-    return new ProcessEngineImpl(this);
+    init();//初始化各种属性值
+    return new ProcessEngineImpl(this);//实例化ProcessEngineImpl类
   }
   
   // init /////////////////////////////////////////////////////////////////////
   
   protected void init() {
-    initHistoryLevel();
-    initExpressionManager();
-    initVariableTypes();
-    initBeans();
-    initFormEngines();
-    initFormTypes();
-    initScriptingEngines();
-    initBusinessCalendarManager();
-    initCommandContextFactory();
-    initTransactionContextFactory();
-    initCommandExecutors();
-    initServices();
-    initIdGenerator();
-    initDeployers();
-    initJobExecutor();
-    initDataSource();
-    initTransactionFactory();
-    initSqlSessionFactory();
-    initSessionFactories();
-    initJpa();
-    initDelegateInterceptor();
-    initEventHandlers();
-    initFailedJobCommandFactory();
-    initConfigurators();
+    initHistoryLevel();//初始化历史记录归档级别,默认为AUDIT级别
+    initExpressionManager();//初始化表达式管理器
+    initVariableTypes();//初始化变量类型
+    initBeans();//初始化可以管理的bean
+    initFormEngines();//初始化表单引擎
+    initFormTypes();//初始化表单类型
+    initScriptingEngines();//初始化脚本引擎
+    initBusinessCalendarManager();//初始化日期管理器
+    initCommandContextFactory();//初始化命令上下文工厂
+    initTransactionContextFactory();//初始化事务上下文工厂
+    initCommandExecutors();//初始化命令执行器
+    initServices();//为各种服务类对象,比如repositoryService设置命令执行器
+    initIdGenerator();//初始化ID生成器
+    initDeployers();//初始化部署器
+    initJobExecutor();//初始化定时任务执行器
+    initDataSource();//初始化关系型数据库数据源
+    initTransactionFactory();//初始化事务工厂
+    initSqlSessionFactory();//初始化SQLSession工厂
+    initSessionFactories();//初始化Session工厂
+    initJpa();//初始化Jpa
+    initDelegateInterceptor();//初始化代理拦截器,负责处理拦截器默认实现类(拦截监听器或者表达式)
+    initEventHandlers();//初始化事件处理类
+    initFailedJobCommandFactory();  //初始化失败命令工厂
+    initConfigurators();  //初始化配置器
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
