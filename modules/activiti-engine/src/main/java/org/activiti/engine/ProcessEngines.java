@@ -62,7 +62,7 @@ public abstract class ProcessEngines {
   
   private static Logger log = LoggerFactory.getLogger(ProcessEngines.class);
   
-  public static final String NAME_DEFAULT = "default";
+  public static final String NAME_DEFAULT = "default";//流程引擎的名称默认为default
   
   protected static boolean isInitialized = false; 
   protected static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
@@ -74,13 +74,17 @@ public abstract class ProcessEngines {
    * resources <code>activiti.cfg.xml</code> (plain Activiti style configuration)
    * and for resources <code>activiti-context.xml</code> (Spring style configuration). */
   public synchronized static void init() {
+    //再次确认流程引擎是否被初始化
     if (!isInitialized) {
       if(processEngines == null) {
         // Create new map to store process-engines if current map is null
-        processEngines = new HashMap<String, ProcessEngine>();        
+        //key是流程引擎名称,value值为ProcessEngine实例对象,
+        // 通过这个数据结构可以知道,如果流程引擎的名称相同则只会存储一份ProcessEngine实例对象
+        processEngines = new HashMap<String, ProcessEngine>();
       }
-      ClassLoader classLoader = ReflectUtil.getClassLoader();
+      ClassLoader classLoader = ReflectUtil.getClassLoader(); ////获取类加载器
       Enumeration<URL> resources = null;
+      //-----------------------------------------
       try {
         resources = classLoader.getResources("activiti.cfg.xml");
       } catch (IOException e) {
@@ -90,12 +94,12 @@ public abstract class ProcessEngines {
       // Remove duplicated configuration URL's using set. Some classloaders may return identical URL's twice, causing duplicate startups
       Set<URL> configUrls = new HashSet<URL>();
       while (resources.hasMoreElements()) {
-        configUrls.add( resources.nextElement() );
+        configUrls.add( resources.nextElement() );//添加到configUrls集合
       }
       for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
-        URL resource = iterator.next();
+        URL resource = iterator.next(); //循环遍历
         log.info("Initializing process engine using configuration '{}'",  resource.toString());
-        initProcessEnginFromResource(resource);
+        initProcessEnginFromResource(resource);//构造ProcessEngine实例对象
       }
       
       try {
@@ -106,7 +110,7 @@ public abstract class ProcessEngines {
       while (resources.hasMoreElements()) {
         URL resource = resources.nextElement();
         log.info("Initializing process engine using Spring configuration '{}'",  resource.toString());
-        initProcessEngineFromSpringResource(resource);
+        initProcessEngineFromSpringResource(resource);//构造ProcessEngine实例对象
       }
 
       isInitialized = true;
@@ -117,6 +121,7 @@ public abstract class ProcessEngines {
 
   protected static void initProcessEngineFromSpringResource(URL resource) {
     try {
+      //委托ReflectUtil类的静态方法loadClass加载SpringConfigurationHelper类
       Class< ? > springConfigurationHelperClass = ReflectUtil.loadClass("org.activiti.spring.SpringConfigurationHelper");
       Method method = springConfigurationHelperClass.getMethod("buildProcessEngine", new Class<?>[]{URL.class});
       ProcessEngine processEngine = (ProcessEngine) method.invoke(null, new Object[]{resource});

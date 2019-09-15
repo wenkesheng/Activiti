@@ -17,7 +17,8 @@ package org.activiti.engine;
  * 
  * @author Joram Barrez 
  */
-public interface EngineServices {
+public interface EngineServices {//这个接口设计的多余,ProcessEngine继承这个接口之后,只是新增了获取版本号,流程引擎名称和关闭
+  // 所以在flowable已经把这个接口中定义的方法全部迁移到ProcessEngine里面去定义然后把这个EngineServices接口删掉了
 
   RepositoryService getRepositoryService();
   

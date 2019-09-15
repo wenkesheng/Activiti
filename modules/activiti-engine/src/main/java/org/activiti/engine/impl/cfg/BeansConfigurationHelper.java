@@ -29,17 +29,24 @@ import org.springframework.core.io.Resource;
 public class BeansConfigurationHelper {
 
   public static ProcessEngineConfiguration parseProcessEngineConfiguration(Resource springResource, String beanName) {
+    //实例化Spring框架中的DefaultListableBeanFactory类
     DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
     XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+    //设置验证模式为XSD,当然也支持DTD方式验证
     xmlBeanDefinitionReader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
+    //加载读取到的springResource资源并交给Spring进行解析
     xmlBeanDefinitionReader.loadBeanDefinitions(springResource);
+    //通过beanFactory对象获取ProcessEngineConfigurationImpl实例对象
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) beanFactory.getBean(beanName);
+    //将beanFactory对象使用SpringBeanFactoryProxyMap进行封装
     processEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(beanFactory));
     return processEngineConfiguration;
   }
 
   public static ProcessEngineConfiguration parseProcessEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
+    //将inputStream对象转化为Spring中的Resource对象
     Resource springResource = new InputStreamResource(inputStream);
+    //实例化流程配置文件中的Bean
     return parseProcessEngineConfiguration(springResource, beanName);
   }
 
